@@ -41,13 +41,11 @@ public class TweetBuilder {
 	private static ArrayList<Word> wordList = new ArrayList<Word>();
 	private static File fileName = new File("KanyeTweets.txt");
 	private static int totalWords = 0;
-	//private static ArrayList<String> stringArray = new ArrayList<String>();
-	//private static ArrayList<ArrayList<String>> stringArray = new ArrayList<ArrayList<String>>();
 	
 	public static void main(String[] args) {
 		modelBuilder();
 		//printArray();
-		//System.out.println(tweetBuilder(5));
+		System.out.println(tweetBuilder(5));
 	}
 	
 	public static void modelBuilder() {
@@ -137,7 +135,6 @@ public class TweetBuilder {
 					break;
 				}
 			}
-			
 		}
 	}
 	
@@ -148,31 +145,32 @@ public class TweetBuilder {
 		Word firstWord = wordList.get(rng.nextInt(totalWords));
 		tweet = firstWord.word;
 		length--;
-		//grab a random next word and add it to the tweet
-		System.out.println("First word: " + firstWord);
-		System.out.println("Possible next words: ");
-		for (TweetBuilder.NextWord nxtwrd : firstWord.nextWords) {
-			System.out.println(nxtwrd);
-		}
-		
-		TweetBuilder.NextWord next = firstWord.nextWords.get(rng.nextInt(firstWord.nextWords.size()));
-		System.out.println(next.word + " is the next word");
-		tweet = tweet + " " + next.word;
-		length--;
-		//find the next words to create a tweet of the desired length
+		//check to see if there are any possible next words
+		//if it is not empty continue
+		Word currentWord = firstWord;
 		while (length > 0) {
-			//find the word object for the current word
-			boolean wordFound = false;
-			while (!wordFound) {
-				//System.out.println("Looking for: " + next);
-				for (TweetBuilder.Word word : wordList) {
-					if (word.word.toLowerCase().equals(next)) {
-						next = word.nextWords.get(rng.nextInt(firstWord.nextWords.size()));
-						wordFound = true;
+			if (!currentWord.nextWords.isEmpty()) {
+				//grab a next word based off the weight and add it to the tweet
+				int highestWeight = 0;
+				//set the nextWord to the first word in the list
+				String nextWord = currentWord.nextWords.get(0).word;
+				//iterate over the next words to see if a higher weight exists
+				for (NextWord nw : currentWord.nextWords) {
+					if (nw.weight >= highestWeight) {
+						//if the weight is higher, use that word instead
+						nextWord = nw.word;
+					}
+				}
+				//add the next word to the tweet
+				tweet += " " + nextWord;
+				//find the word object of the word that was just added
+				for (Word w : wordList) {
+					//when the word object is found, update the current word
+					if (w.word.equals(nextWord)) {
+						currentWord = w;
 					}
 				}
 			}
-			tweet = tweet + " " + next;
 			length--;
 		}
 		return tweet;
