@@ -100,24 +100,38 @@ public class TweetBuilder {
 	}
 	
 	public static void findNextWords(ArrayList<String> wordsFound) {
-		System.out.println("Finding the next words");
+		//System.out.println("Finding the next words");
 		//iterate over the words found and find their object in the word list
 		for (int i = 0; i < wordsFound.size() - 1; i++) {
+			//System.out.println("Finding " + wordsFound.get(i));
+			String currentWord = wordsFound.get(i);
+			String nextWord = wordsFound.get(i + 1);
 			for (Word w : wordList) {				
 				//once the word object is found add the next word
-				if (w.word.equals(wordsFound.get(i))) {
+				if (w.word.equals(currentWord)) {
 					//System.out.println(wordsFound.get(i) + " found! Adding: " + wordsFound.get(i + 1));
-					for (NextWord nw : w.nextWords) {
-						//if the word has already been added, increase the weight
-						if (nw.word.toLowerCase().equals(wordsFound.get(i + 1).toLowerCase())) {
-							nw.weight++;
-							System.out.println(nw.word + " increased to" + nw.weight);
-							break;
-						} else {
+					//check if the list is empty. If it is, add the first word
+					if (w.nextWords.isEmpty()) {
+						NextWord next = new NextWord(nextWord);
+						w.nextWords.add(next);
+						//System.out.println(next.word + " added");
+					} else {
+						boolean found = false;
+						for (NextWord nw : w.nextWords) {
+							//System.out.println("Checking for: " + nw.word + " against: " + wordsFound.get(i + 1));
+							//if the word has already been added, increase the weight
+							if (nw.word.toLowerCase().equals(nextWord.toLowerCase())) {
+								nw.weight++;
+								//System.out.println(nw.word + " increased to " + nw.weight);
+								found = true;
+								break;
+							}
+						}
+						if (!found) {
 							//the the word isn't already in the next words list, add it with a weight of zero
-							NextWord next = new NextWord(wordsFound.get(i));
+							NextWord next = new NextWord(nextWord);
 							w.nextWords.add(next);
-							System.out.println(next + " added");
+							//System.out.println(next.word + " added");
 						}
 					}
 					break;
@@ -167,9 +181,9 @@ public class TweetBuilder {
 	public static void printArray() {
 		for (TweetBuilder.Word word : wordList) {
 			System.out.println(word.word + " appears " + word.number + " times");
-//			for (TweetBuilder.NextWord nextWord : word.nextWords) {
-//				System.out.println(nextWord.word + " commonly appears after " + word.word);
-//			}
+			for (TweetBuilder.NextWord nextWord : word.nextWords) {
+				System.out.println("Common next words: " + nextWord.word);
+			}
 		}
 	}
 }
